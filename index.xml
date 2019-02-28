@@ -174,5 +174,14 @@ Kec. Gunung Kaler Kab. Tangerang 15830
 Banten</description>
     </item>
     
+    <item>
+      <title>Pendaftaran Siswa On Line</title>
+      <link>https://smk-annabilah.github.io/ppdb-online/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://smk-annabilah.github.io/ppdb-online/</guid>
+      <description> Name   Alamat   NISN  No. Telp /HP   Send  </description>
+    </item>
+    
   </channel>
 </rss>

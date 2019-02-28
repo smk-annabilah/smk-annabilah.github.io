@@ -167,6 +167,12 @@
   </url>
   
   <url>
+    <loc>https://smk-annabilah.github.io/ppdb-online/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
     <loc>https://smk-annabilah.github.io/tags/pramuka/</loc>
     <lastmod>2019-02-27T01:17:30+07:00</lastmod>
     <changefreq>monthly</changefreq>
