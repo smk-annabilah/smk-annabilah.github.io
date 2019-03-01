@@ -2,12 +2,12 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tentang on SMK AN-NABILAH</title>
-    <link>https://smk-annabilah.github.io/about/</link>
+    <link>https://smk-annabilah.netlify.com/about/</link>
     <description>Recent content in Tentang on SMK AN-NABILAH</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     
-	<atom:link href="https://smk-annabilah.github.io/about/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://smk-annabilah.netlify.com/about/index.xml" rel="self" type="application/rss+xml" />
     
     
   </channel>

@@ -2,39 +2,39 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on SMK AN-NABILAH</title>
-    <link>https://smk-annabilah.github.io/tags/</link>
+    <link>https://smk-annabilah.netlify.com/tags/</link>
     <description>Recent content in Tags on SMK AN-NABILAH</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Wed, 27 Feb 2019 01:17:30 +0700</lastBuildDate>
     
-	<atom:link href="https://smk-annabilah.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://smk-annabilah.netlify.com/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Pelantikan</title>
-      <link>https://smk-annabilah.github.io/tags/pelantikan/</link>
+      <link>https://smk-annabilah.netlify.com/tags/pelantikan/</link>
       <pubDate>Wed, 27 Feb 2019 01:17:30 +0700</pubDate>
       
-      <guid>https://smk-annabilah.github.io/tags/pelantikan/</guid>
+      <guid>https://smk-annabilah.netlify.com/tags/pelantikan/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Pramuka</title>
-      <link>https://smk-annabilah.github.io/tags/pramuka/</link>
+      <link>https://smk-annabilah.netlify.com/tags/pramuka/</link>
       <pubDate>Wed, 27 Feb 2019 01:17:30 +0700</pubDate>
       
-      <guid>https://smk-annabilah.github.io/tags/pramuka/</guid>
+      <guid>https://smk-annabilah.netlify.com/tags/pramuka/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Tentang</title>
-      <link>https://smk-annabilah.github.io/tags/tentang/</link>
+      <link>https://smk-annabilah.netlify.com/tags/tentang/</link>
       <pubDate>Fri, 22 Feb 2019 21:06:03 +0700</pubDate>
       
-      <guid>https://smk-annabilah.github.io/tags/tentang/</guid>
+      <guid>https://smk-annabilah.netlify.com/tags/tentang/</guid>
       <description></description>
     </item>
     
