@@ -1,0 +1,2 @@
+# Redirect default Netlify subdomain to primary domain
+http://smk-annabilah.netlify.com/* http://smk-annabilah.sch.id/:splat 301!
