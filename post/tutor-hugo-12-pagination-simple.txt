@@ -1,0 +1,271 @@
+
+-- -- -- Theme 05 - 02 -- -- -- Prepare -- -- --
+
+Pagination can be set in config.toml
+
+* config.toml
+
+Paginate     = 7
+
+In layout we are going to use
+
+{{ $paginator := .Paginate .Site.Pages }}
+
+Since we only show specific page kind named post, 
+we should filter the pages using where.
+
+{{ $paginator := .Paginate (where .Site.Pages "Type" "post") }}
+
+While debugging, or development process,
+we can do this to override sitewide configuration.
+
+{{ $paginator := .Paginate (where .Site.Pages "Type" "post") 5 }}
+
+This is a very helpful trick for me.
+
+-- -- -- Theme 05 - 02 -- -- -- Layout -- -- --
+
+Change our previous blog list
+
+* themes/tutor-05/layouts/archives/list.html
+
+  {{ $posts := where .Site.Pages "Type" "post" }}
+  <section id="archive">
+  <div class="post-list">
+    {{ range $posts }}
+      {{ partial "summary-blog-list.html" . }}
+    {{ end }}
+  </div>
+  </section>
+
+to use paginator
+
+  {{ $paginator := .Paginate (where .Site.Pages "Type" "post") }}
+  {{ partial "pagination-simple.html" (dict "p" $paginator) }}
+  <section id="archive">
+  <div class="post-list">
+    {{ range $paginator.Pages }}
+      {{ partial "summary-blog-list.html" . }}
+    {{ end }}
+  </div>
+  </section>
+
+The complete file is here below:
+
+{{ define "main" }}
+<main role="main" 
+      class="container-fluid m-3 m-sm-0 p-3
+             bg-light rounded border border-dark shadow-hover">
+  <header>
+    <h4>{{ .Title | default .Site.Title }}</h4>
+  </header>
+
+  <article>
+    {{ .Content }}
+  </article>
+
+  {{ $paginator := .Paginate (where .Site.Pages "Type" "post") }}
+  {{ partial "pagination-simple.html" (dict "p" $paginator) }}
+  <section id="archive">
+  <div class="post-list">
+    {{ range $paginator.Pages }}
+      {{ partial "summary-blog-list.html" . }}
+    {{ end }}
+  </div>
+  </section>
+</main>
+{{ end }}
+
+-- -- -- Theme 05 - 02 -- -- -- Previous Next -- -- --
+
+Where our minimal pagination logic would be:
+
+{{/* Pagination links */}}
+<nav aria-label="Page navigation">
+
+  {{ if gt .p.TotalPages 1 }}
+  <ul class="pagination justify-content-center">
+
+  </ul>
+  {{ end }}
+</nav>
+
+-- -- --
+
+It means, no need to show any pagination navigation,
+if we what we have is only one page.
+
+Of course this is not enough.
+Our minimal pagination shpuld show something.
+
+* themes/tutor-05/layouts/partials/pagination-simple.html
+
+<nav aria-label="Page navigation">
+
+  {{ if gt .p.TotalPages 1 }}
+  <ul class="pagination justify-content-center">
+
+    <!-- Previous Page. -->
+    {{ if .p.HasPrev }}
+      <li class="page-item">
+        <a class="page-link" href="{{ .p.Prev.URL }}"
+           rel="prev">Previous</a>
+      </li>
+    {{ else }}
+      <li class="page-item disabled">
+        <span class="page-link">Previous</span>
+      </li>
+    {{ end }}
+
+    <!-- Next Page. -->
+    {{ if .p.HasNext }}
+      <li class="page-item">
+        <a class="page-link" href="{{ .p.Next.URL }}"
+           rel="next">Next</a>
+      </li>
+    {{ else }}
+      <li class="page-item disabled">
+        <span class="page-link">Next</span>
+      </li>
+    {{ end }}
+
+  </ul>
+  {{ end }}
+
+</nav>
+
+[image]
+
+-- -- -- Theme 05 - 02 -- -- -- First Last -- -- --
+
+Consider also add first page and last page.
+
+{{/* Pagination links */}}
+<nav aria-label="Page navigation">
+
+  {{ if gt .p.TotalPages 1 }}
+  <ul class="pagination justify-content-center">
+
+    <!-- First Page. -->
+    {{ if not (eq .p.PageNumber 1) }}
+      <li class="page-item">
+        <a class="page-link" href="{{ .p.First.URL }}"
+           rel="first">First</a>
+      </li>
+    {{ else }}
+      <li class="page-item disabled">
+        <span class="page-link">First</span>
+      </li>
+    {{ end }}
+
+    ...
+
+    <!-- Last Page. -->
+    {{ if not (eq .p.PageNumber .p.TotalPages) }}
+      <li class="page-item">
+        <a class="page-link" href="{{ .p.Last.URL }}"
+           rel="last">Last</a>
+      </li>
+    {{ else }}
+      <li class="page-item disabled">
+        <span class="page-link">Last</span>
+      </li>
+    {{ end }}
+  </ul>
+  {{ end }}
+
+</nav>
+
+[image]
+
+-- -- -- Theme 05 - 02 -- -- -- Indicator Number -- -- --
+
+And also the pagination position
+
+<nav aria-label="Page navigation">
+
+  {{ if gt .p.TotalPages 1 }}
+  <ul class="pagination justify-content-center">
+    ...
+
+    <!-- Indicator Number. -->
+    <li class="page-item">
+      <span class="page-link">
+        Page: {{ .p.PageNumber }} of {{ .p.TotalPages }}</span>
+    </li>
+
+    ...
+  </ul>
+  {{ end }}
+
+</nav>
+
+[image]
+
+-- -- -- Theme 05 - 02 -- -- -- Summary -- -- --
+
+Complete Code
+
+
+<nav aria-label="Page navigation">
+
+  {{ if gt .p.TotalPages 1 }}
+  <ul class="pagination justify-content-center">
+
+    <!-- First Page. -->
+    {{ if not (eq .p.PageNumber 1) }}
+      <li class="page-item">
+        <a class="page-link" href="{{ .p.First.URL }}" 
+           rel="first">First</a>
+      </li>
+    {{ else }}
+      <li class="page-item disabled">
+      <span class="page-link">First</span>
+    {{ end }}
+
+    <!-- Previous Page. -->
+    {{ if .p.HasPrev }}
+      <li class="page-item">
+        <a class="page-link" href="{{ .p.Prev.URL }}" 
+           rel="prev">Previous</a>
+      </li>
+    {{ else }}
+      <li class="page-item disabled">
+        <span class="page-link">Previous</span>
+      </li>
+    {{ end }}
+
+    <!-- Indicator Number. -->
+    <li class="page-item disabled">
+      <span class="page-link">
+        Page: {{ .p.PageNumber }} of {{ .p.TotalPages }}</span>
+    </li>
+
+    <!-- Next Page. -->
+    {{ if .p.HasNext }}
+      <li class="page-item">
+        <a class="page-link" href="{{ .p.Next.URL }}" 
+           rel="next">Next</a>
+      </li>
+    {{ else }}
+      <li class="page-item disabled">
+        <span class="page-link">Next</span>
+      </li>
+    {{ end }}
+
+    <!-- Last Page. -->
+    {{ if not (eq .p.PageNumber .p.TotalPages) }}
+      <li class="page-item">
+        <a class="page-link" href="{{ .p.Last.URL }}" 
+           rel="last">Last</a>
+      </li>
+    {{ else }}
+      <li class="page-item disabled">
+        <span class="page-link">Last</span>
+      </li>
+    {{ end }}
+  </ul>
+  {{ end }}
+
+</nav>
+

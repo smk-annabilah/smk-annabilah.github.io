@@ -1,0 +1,36 @@
+Hugo - SASS - Pagination - Responsive
+
+-- -- -- Theme 05 - 02 -- -- -- Source -- -- --
+
+I respect copyright.
+The code below inspired by:
+
+* https://www.timble.net/blog/2015/05/better-pagination-for-jekyll/
+
+* https://github.com/timble/jekyll-pagination
+
+I made a slight modification.
+But of course the logic remain the same.
+
+-- -- -- Theme 05 - 02 -- -- -- Prepare -- -- --
+
+
+-- -- -- Theme 05 - 02 -- -- -- Basic Math -- -- --
+
+
+
+-- -- -- Theme 05 - 02 -- -- -- Adjacent -- -- --
+
+-- -- -- Theme 05 - 02 -- -- -- Prev Next -- -- --
+
+-- -- -- Theme 05 - 02 -- -- -- Before After -- -- --
+
+-- -- -- Theme 05 - 02 -- -- -- Responsive -- -- --
+
+-- -- -- Theme 05 - 02 -- -- -- Responsive -- -- --
+
+
+    <li class="pages-indicator pages-indicator--offset-">
+        <span class="sr-only">Skipped pages indicator</span>
+        <span aria-hidden="true">...</span>
+    </li>

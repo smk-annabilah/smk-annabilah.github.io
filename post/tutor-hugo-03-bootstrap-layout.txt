@@ -1,0 +1,269 @@
+
+-- -- -- Theme 02 - 01 -- -- -- Add Bootstrap -- -- --
+
+$ hugo new theme tutor-02
+Creating theme at /media/Works/sites/tutor-hugo/themes/tutor-02
+
+$ cat config.toml
+theme        = "tutor-02"
+
+$ cd themes/tutor-02 
+
+-- -- --
+
+copy bootstrap dist to themes/tutor-02/static
+
+$ tree
+static
+├── css
+├── dist
+│  ├── css
+│  │  ├── bootstrap-grid.css
+│  │  ├── bootstrap-grid.min.css
+│  │  ├── bootstrap-reboot.css
+│  │  ├── bootstrap-reboot.min.css
+│  │  ├── bootstrap.css
+│  │  └── bootstrap.min.css
+│  └── js
+│     ├── bootstrap.bundle.js
+│     ├── bootstrap.bundle.min.js
+│     ├── bootstrap.js
+│     └── bootstrap.min.js
+└── js
+
+-- -- --
+
+copy from tutor-01 to tutor-02
+* layouts/index.html
+
+--
+
+$ cat layouts/index.html
+
+{{ define "main" }}
+{{ .Content }}
+{{ end }}
+
+--
+
+$ cat layouts/_default/baseof.html
+
+<!DOCTYPE html>
+<html lang="en">
+{{ partial "site-head.html" . }}
+<body>
+  {{ .Content }}
+</body>
+</html>
+
+--
+
+$ cat layouts/partials/site-head.html
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>{{ .Page.Title | default .Site.Title }}</title>
+  
+    <link rel="stylesheet" type="text/css" href="{{ "dist/css/bootstrap.css" | relURL }}">
+</head>
+
+--
+
+open in browser:
+* http://localhost:1313/
+
+You should see, white background.
+
+-- -- -- Theme 02 - 02 -- -- -- Refactor -- -- --
+
+Before we begin, first create the layout.
+
+* layouts/_default/baseof.html
+
+We are going to refactor later into
+
+* layouts/_default/baseof.html
+* layouts/_default/single.html
+* layouts/index.html
+* layouts/partials/site-header.html
+* layouts/partials/site-footer.html
+
+--
+
+I put colors so you can get the idea,
+about this responsive layout clearly.
+I also put grid, just as an example.
+
+$ cat layouts/_default/baseof.html
+
+<!DOCTYPE html>
+<html lang="en">
+{{ partial "site-head.html" . }}
+<body>
+  <header>
+    <nav class="bg-dark text-light">
+      <a href="{{ .Site.BaseURL }}" class="text-light">Home</a>
+    </nav>
+  </header>
+
+  <div class="container-fluid">
+
+    <div class="row layout-base">
+      <main role="main" class="container-fluid col-md-8 bg-primary">
+        <section>
+          <h4>{{ .Title | default .Site.Title }}</h4>
+        </section>
+
+        <article class="bg-light">
+          {{ .Content }}
+        </article>
+      </main>
+      
+      <aside class="col-md-4 bg-info">
+        Side menu
+      </aside>
+
+    </div><!-- .row -->
+
+  </div><!-- .container-fluid -->
+
+  <footer class="container-fluid bg-dark text-light text-center">
+    &copy; {{ now.Year }}.
+  </footer>
+
+</body>
+</html>
+
+Consider refactor
+
+--
+
+$ cat layouts/_default/baseof.html
+
+<!DOCTYPE html>
+<html lang="en">
+{{ partial "site-head.html" . }}
+<body>
+{{ partial "site-header.html" . }}
+
+  <div class="container-fluid">
+
+    <div class="row layout-base">
+      {{- block "main" . }}
+      {{ .Content }}
+      {{- end }}
+
+      {{- block "aside" . }}{{- end }}
+    </div><!-- .row -->
+
+  </div><!-- .container-fluid -->
+
+{{ partial "site-footer.html" . }}
+{{ partial "site-scripts.html" . }}
+</body>
+</html>
+
+I moved the footer placement.
+So we do not to repeatly writing footer in every main block.
+
+--
+
+Both these two artefacts.
+* layouts/index.html
+* layouts/_default/single.html
+
+$ cat layouts/_default/single.html
+
+{{ define "main" }}
+  <main role="main" class="container-fluid bg-light">
+    <section>
+      <h4>{{ .Title | default .Site.Title }}</h4>
+    </section>
+
+    <article>
+      {{ .Content }}
+    </article>
+  </main>
+{{ end }}
+
+--
+
+$ cat layouts/partials/site-header.html
+
+<header>
+  <nav class="bg-dark text-light">
+    <a href="{{ .Site.BaseURL }}" class="text-light">Home</a>
+  </nav>
+</header>
+
+
+--
+
+$ cat layouts/partials/site-footer.html
+
+
+<footer class="container-fluid bg-dark text-light text-center">
+  &copy; {{ now.Year }}.
+</footer>
+
+--
+
+$ cat layouts/partials/site-scripts.html
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+
+
+--
+
+And see the result in browser.
+
+--
+
+We should also change the list
+
+* layouts/_default/list.html
+
+$ cat layouts/_default/list.html
+
+{{ define "main" }}
+<main role="main" class="container-fluid bg-light">
+  <section>
+    <h4>{{ .Section }}</h4>
+  </section>
+
+  {{ .Content }}
+  
+  <ul>
+    {{ range .Data.Pages }}
+    <li>
+      <a href="{{ .URL }}">{{ .Title }}</a>
+    </li>
+    {{ end }}
+  </ul>
+</main>
+{{ end }}
+
+And also see the result in browser.
+
+--
+
+So far here is our layouts
+
+$ tree
+layouts
+├── _default
+│  ├── baseof.html
+│  ├── list.html
+│  └── single.html
+├── index.html
+└── partials
+   ├── site-footer.html
+   ├── site-head.html
+   ├── site-header.html
+   └── site-scripts.html
+

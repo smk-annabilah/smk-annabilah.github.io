@@ -1,0 +1,315 @@
+
+-- -- -- Theme 04 - 01 -- -- -- Prepare Theme -- -- --
+
+Before going futher with Hugo,
+we need to clean up our sass,
+because the next chapter require a nice looks.
+
+As usual, with your file manager:
+
+Copy manually /themes/tutor-03 to /themes/tutor-04
+
+$ cat config.toml
+theme        = "tutor-04"
+
+This chapter is more like a Bootstrap guidance rather than Hugo.
+In fact this chapter doesn't require Hugo at all.
+This chapter is completely out of topic.
+
+-- Watch Both
+
+As usual, run Hugo
+
+$ hugo server
+
+And do not forget, run the good SASS, using other terminal
+
+$ cd themes/tutor-04
+$ sass --watch sass:static
+
+-- -- -- Theme 04 - 01 -- -- -- Prepare Stylesheet -- -- --
+
+For starter, I put a nice background, using subtle pattern.
+
+$ cat sass/css/_decoration.scss
+
+// -- -- -- -- --
+// _decoration.scss
+
+body {
+    background-image: url("../images/funky-lines.png");
+}
+
+-- 
+
+And empty stylesheet file
+
+$ cat sass/css/_layout.scss
+
+// -- -- -- -- --
+// _layout.scss
+
+--
+
+And add this stylesheet into <code>main.scss</code>.
+
+$ cat sass/css/main.scss
+
+@import
+  // taken from bootstrap
+    "sticky-footer-navbar",
+    "blog",
+    "bootstrap-custom",
+
+  // variables
+    "bootstrap/functions",
+    "variables",
+    "bootstrap/variables",
+
+  // custom
+    "layout",
+    "decoration"
+;
+
+--
+
+[image-small]
+
+-- -- -- Theme 04 - 02 -- -- -- Maxwidth Using Bootstrap -- -- --
+
+I have a smartphone, tablet, sometimes medium screen,
+and mostly I'm working with large screen.
+What is good for my regular screen, looks ugly in large screen.
+My solution is to create maxwidth,
+so my content would not stretch horizontally.
+Unfortunately, bootstrap maxwidth, does not suit my needs.
+
+There are at least two options:
+
+* first: using bootstrap,
+
+* second: custom css class
+
+--
+
+Using bootstrap is simply 
+add these classes <code>offset-lg-2 col-lg-8 offset-lg-2</code>.
+or even for medium screen <code>offset-md-2 col-md-8 offset-md-2</code>.
+And put these classes as below:
+
+$ cat layouts/_default/baseof.html
+
+<!DOCTYPE html>
+...
+  <div class="container-fluid offset-lg-2 col-lg-8 offset-lg-2">
+...
+
+--
+
+For illutration below, I put border, so you can see clearly,
+how the responsive goes in medium screen.
+
+[image]
+
+-- -- -- Theme 04 - 02 -- -- -- Maxwidth Using Custom -- -- --
+
+The other way is using custom stylesheet.
+Instead of relying on bootstrap,
+I'd rather lock the design with fixed width in pixel.
+ 
+--
+
+The <code>maxwidth</code> class is as simply as below:
+
+$ cat sass/css/_layout.scss
+
+// -- -- -- -- --
+// _layout.scss
+
+.maxwidth {
+   margin-right: auto;
+   margin-left: auto;
+   max-width: 1366px; /* or 1360px */
+}
+
+--
+
+Add this <code>maxwidth</code> class.
+And put it as below:
+
+$ cat layouts/_default/baseof.html
+
+<!DOCTYPE html>
+...
+  <div class="container-fluid maxwidth">
+...
+
+--
+
+And the header
+
+$ cat layouts/partials/site-header.html
+
+<header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top
+              bg-dark maxwidth">
+  ...
+
+--
+
+Also the footer
+
+$ cat layouts/partials/site-footer.html
+
+<footer class="footer bg-transparent">
+  <div class="container text-center 
+              bg-dark text-light maxwidth">
+    <span>&copy; {{ now.Year }}.</span>
+  </div>
+</footer>
+
+--
+
+You can see the different look as below.
+
+[image-large]
+
+I guess it is more consistent than using mix of: md, lg, and xl.
+Not everything should be using bootstrap.
+Create nexessary css, as you need.
+
+-- -- -- Theme 04 - 03 -- -- -- Bootstrap Decoration -- -- --
+
+However, still Bootstrap can save you, from writing a lot of CSS code.
+In order to have a better looks, I like to add these three:
+
+* rounded
+
+* border
+
+* shadow
+
+--
+
+You do not need to use the !default directive at all.
+
+$ cat sass/css/_variables.scss
+
+// Variables
+
+$blue:  #007bff;
+$dark:  darken($blue, 35%);
+
+$border-radius: 4px;
+$border-color:  $dark; // no default
+
+--
+
+Change the header
+
+$ cat layouts/partials/site-header.html
+
+<header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top
+              bg-dark maxwidth rounded-bottom shadow
+              border border-top-0 border-light">
+  ...
+
+--
+
+And the footer
+
+$ cat layouts/partials/site-footer.html
+
+<footer class="footer bg-transparent">
+  <div class="container
+              text-center bg-dark text-light
+              maxwidth rounded-top shadow
+              border border-bottom-0 border-light">
+    <span>&copy; {{ now.Year }}.</span>
+  </div>
+</footer>
+
+--
+
+Also these two:
+
+* layouts/_default/single.html
+
+* layouts/_default/list.html
+
+{{ define "main" }}
+<main role="main" class="container-fluid 
+            bg-light rounded border border-dark shadow">
+
+--
+
+But this one is, a little bit different:
+
+* layouts/posts/single.html
+
+{{ define "main" }}
+  <main role="main" class="col-md-8">
+    <div class="blog-main p-3 mb-3
+                bg-light rounded border border-dark shadow">
+      <div class="blog-post">
+        <section>
+          <h2 class="blog-post-title"
+              >{{ .Title | default .Site.Title }}</h2>
+          <p  class="blog-post-meta"
+              >{{ .Page.Date.Format "January 02, 2006" }} by <a href="#">epsi</a></p>
+        </section>
+
+        <article>
+          {{ .Content }}
+        </article>
+      </div><!-- /.blog-post -->
+    </div><!-- /.blog-main -->
+  </main>
+{{ end }}
+
+{{ define "aside" }}
+  <aside class="col-md-4 blog-sidebar">
+    <div class="p-3 mb-3
+                bg-light rounded border border-dark shadow">
+      <h4 class="font-italic">About You</h4>
+      Are you an angel ?
+    </div>
+  </aside>
+{{ end }}
+
+Actually, this is just an example.
+You should write, what suit you most.
+
+-- -- -- Theme 04 - 03 -- -- -- Non Bootstrap Decoration -- -- --
+
+Not everything can be solved using bootstrap.
+For example, hover would not work,
+because of this !important directive.
+
+* sass/bootstrap/utilities/_shadows.scss
+
+// stylelint-disable declaration-no-important
+
+.shadow-sm { box-shadow: $box-shadow-sm !important; }
+.shadow { box-shadow: $box-shadow !important; }
+.shadow-lg { box-shadow: $box-shadow-lg !important; }
+.shadow-none { box-shadow: none !important; }
+
+To solve this, you need to create your own css.
+
+$ cat sass/css/_decoration.scss
+
+// -- -- -- -- --
+// _decoration.scss
+
+...
+
+.shadow-hover { box-shadow: $box-shadow; }
+
+.shadow-hover:hover {
+    box-shadow: 0 1rem 3rem rgba($black, .175);
+    transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+}
+
+And rename all shadow class to shadow-hover.

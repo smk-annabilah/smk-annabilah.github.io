@@ -1,0 +1,192 @@
+
+-- -- -- Theme 05 - 02 -- -- -- Prepare -- -- --
+
+  {{ $paginator := .Paginate (where .Site.Pages "Type" "post") }}
+  {{ partial "pagination-number.html" (dict "p" $paginator) }}
+  <section id="archive">
+  <div class="post-list">
+    {{ range $paginator.Pages }}
+      {{ partial "summary-blog-list.html" . }}
+    {{ end }}
+  </div>
+  </section>
+
+-- -- -- Theme 05 - 02 -- -- -- Number -- -- --
+
+Pagination by number is also simple.
+
+<nav aria-label="Page navigation">
+
+  {{ if gt .p.TotalPages 1 }}
+  <ul class="pagination justify-content-center">
+
+    <!-- Page numbers. -->
+    {{ $pagenumber := .p.PageNumber }}
+
+    {{ range .p.Pagers }}
+    <li class="page-item {{ if eq $pagenumber .PageNumber }} active{{ end }}">
+      {{ if not (eq $pagenumber .PageNumber) }} 
+      <a href="{{ .URL }}" class="page-link">
+        {{ .PageNumber }}
+      </a>
+      {{ else }}
+      <span class="page-link">
+        {{ .PageNumber }}
+      </span>
+      {{ end }}
+    </li>
+    {{ end }}
+
+  </ul>
+  {{ end }}
+
+</nav>
+
+-- -- -- Theme 05 - 02 -- -- -- Prev Next -- -- --
+
+Consider give it a prev next button.
+This time using symbol instead of word.
+
+<nav aria-label="Page navigation">
+
+  {{ if gt .p.TotalPages 1 }}
+  <ul class="pagination justify-content-center">
+
+    <!-- Previous Page. -->
+    {{ if .p.HasPrev }}
+      <li class="page-item blog_previous">
+        <a class="page-link" href="{{ .p.Prev.URL }}" rel="prev">&laquo;</a>
+      </li>
+    {{ else }}
+      <li class="page-item blog_previous disabled">
+        <span class="page-link">&laquo;</span>
+      </li>
+    {{ end }}
+
+    ...
+
+    <!-- Next Page. -->
+    {{ if .p.HasNext }}
+      <li class="page-item blog_next">
+        <a class="page-link" href="{{ .p.Next.URL }}" rel="next">&raquo;</a>
+      </li>
+    {{ else }}
+      <li class="page-item blog_next disabled">
+        <span class="page-link">&raquo;</span>
+      </li>
+    {{ end }}
+  </ul>
+  {{ end }}
+
+</nav>
+
+Note that, we have additional stylesheet named 
+
+* blog_previous, and 
+* blog_next
+
+-- -- -- Theme 05 - 02 -- -- -- Before After -- -- --
+
+Consider define these pagination classes:
+
+* themes/tutor-05/sass/css/_pagination.scss
+
+.blog_previous {
+  span:after,
+  a:after {
+    content: " previous"
+  }
+}
+
+.blog_next {
+  span:before,
+  a:before {
+    content: "next "
+  }
+}
+
+And add the new scss in main file.
+
+* themes/tutor-05/sass/css/main.scss
+
+@import
+  ...
+
+  // custom
+    "layout",
+    "decoration",
+    "list",
+    "pagination"
+;
+
+-- -- -- Theme 05 - 02 -- -- -- Responsive -- -- --
+
+You can make this responsive by using standard css
+
+* themes/tutor-05/sass/css/_pagination.scss
+
+@media only screen and (min-width: 768px) {
+
+  .blog_previous {
+    span:after,
+    a:after {
+      content: " previous"
+    }
+  }
+
+  .blog_next {
+    span:before,
+    a:before {
+      content: "next "
+    }
+  }
+
+}
+
+By the help of mixins/breakpoints,
+we can rewrite it in bootstrap style.
+
+* themes/tutor-05/sass/css/_pagination.scss
+
+@include media-breakpoint-up(md) {
+
+  .blog_previous {
+    span:after,
+    a:after {
+      content: " previous"
+    }
+  }
+
+  .blog_next {
+    span:before,
+    a:before {
+      content: "next "
+    }
+  }
+
+}
+
+Do not forget to add mixins/breakpoints.
+So we have the complete mian.scss as below.
+
+* themes/tutor-05/sass/css/main.scss
+
+@import
+  // taken from bootstrap
+    "sticky-footer-navbar",
+    "blog",
+    "bootstrap-custom",
+
+  // variables
+    "bootstrap/functions",
+    "variables",
+    "bootstrap/variables",
+    "bootstrap/mixins/breakpoints",
+
+  // custom
+    "layout",
+    "decoration",
+    "list",
+    "pagination"
+;
+

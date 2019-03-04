@@ -1,0 +1,542 @@
+
+-- -- -- Step 01 -- -- -- Source Structure -- -- --
+
+$ hugo version
+Hugo Static Site Generator v0.42.1-4172A835E544B867F292579019D0597439E596BA linux/amd64 BuildDate: 
+
+-- -- --
+
+$ mkdir tutor-hugo
+$ cd tutor-hugo
+
+-- -- --
+
+$ hugo new site .
+Congratulations! Your new Hugo site is created in /media/Works/sites/tutor-hugo.
+
+-- -- --
+
+$ tree
+.
+├── archetypes
+│  └── default.md
+├── config.toml
+├── content
+├── data
+├── layouts
+├── static
+└── themes
+
+-- -- --
+
+$ cat config.toml
+baseURL = "http://example.org/"
+languageCode = "en-us"
+title = "My New Hugo Site"
+
+$ cat archetypes/default.md
+---
+title: "{{ replace .TranslationBaseName "-" " " | title }}"
+date: {{ .Date }}
+draft: true
+---
+
+-- -- -- Step 02 -- -- -- Generated Structure -- -- --
+
+$ hugo
+
+                   | EN  
++------------------+----+
+  Pages            |  3  
+  Paginator pages  |  0  
+  Non-page files   |  0  
+  Static files     |  0  
+  Processed images |  0  
+  Aliases          |  0  
+  Sitemaps         |  1  
+  Cleaned          |  0  
+
+Total in 16 ms
+
+-- -- --
+
+$ exa public --tree
+public
+├── categories
+│  └── index.xml
+├── index.xml
+├── sitemap.xml
+└── tags
+   └── index.xml
+
+-- -- --
+
+$ hugo server
+
+                   | EN  
++------------------+----+
+  Pages            |  3  
+  Paginator pages  |  0  
+  Non-page files   |  0  
+  Static files     |  0  
+  Processed images |  0  
+  Aliases          |  0  
+  Sitemaps         |  1  
+  Cleaned          |  0  
+
+Total in 6 ms
+Watching for changes in /media/Works/sites/tutor-hugo/{content,data,layouts,static}
+Watching for config changes in /media/Works/sites/tutor-hugo/config.toml
+Serving pages from memory
+Running in Fast Render Mode. For full rebuilds on change: hugo server --disableFastRender
+Web Server is available at http://localhost:1313/ (bind address 127.0.0.1)
+Press Ctrl+C to stop
+
+-- -- --
+
+$ curl http://localhost:1313/
+
+<pre>
+</pre>
+
+-- -- -- Step 03 -- -- -- Minimal Homepage -- -- --
+
+In order to have a working index.html you need this two artefacts.
+
+* content/_index.html
+
+* layout/index.html
+
+--
+
+This is our very first content.
+
+$ cat content/_index.html
+
+  <p>There are so many things to say.
+  I don't want to live in regrets.
+  So I wrote this for my love.</p>
+
+Or alternatively:
+
+$ cat content/_index.md
+
+There are so many things to say.
+I don't want to live in regrets.
+So I wrote this for my love.
+
+--
+
+Here we have our very first chroma tag.
+
+$ cat layout/index.html
+
+<p>Dear love,</p>
+
+{{ .Content }}
+
+<p>Sincerely yours.</p>
+
+--
+
+$ exa --tree
+.
+├── archetypes
+│  └── default.md
+├── config.toml
+├── content
+│  └── _index.html
+├── data
+├── layouts
+│  └── index.html
+├── public
+│  ├── categories
+│  │  └── index.xml
+│  ├── index.html
+│  ├── index.xml
+│  ├── sitemap.xml
+│  └── tags
+│     └── index.xml
+├── static
+└── themes
+
+Now we are safely to remove layouts/index.html in root.
+We are going to use make all layouts in theme.
+
+$ rm layouts/index.html
+
+-- -- -- Theme 01 - 01 -- -- -- Minimal Theme -- -- --
+
+In order to make a step by step guidance,
+we need to move the layout to theme.
+
+Of cource you can use site layout instead of theme layout.
+It is just easier to maintain for this tutorial case.
+
+Consider make our very first new theme.
+
+$ hugo new theme tutor-01
+Creating theme at /media/Works/sites/tutor-hugo/themes/tutor-01
+
+$ tree themes
+themes
+└── tutor-01
+   ├── archetypes
+   │  └── default.md
+   ├── layouts
+   │  ├── 404.html
+   │  ├── _default
+   │  │  ├── baseof.html
+   │  │  ├── list.html
+   │  │  └── single.html
+   │  ├── index.html
+   │  └── partials
+   │     ├── footer.html
+   │     └── header.html
+   ├── LICENSE
+   ├── static
+   │  ├── css
+   │  └── js
+   └── theme.toml
+
+Consider changing config.toml, to include newly created theme.
+
+baseURL      = "http://example.org/"
+languageCode = "en-us"
+title        = "Letters to my Beloved"
+theme        = "tutor-01"
+
+> As the config changed, the server should be restarted.
+
+All html files are empty, with zero based size,
+except /layouts/_default/baseof.html
+
+<html>
+    {{- partial "head.html" . -}}
+    <body>
+        {{- partial "header.html" . -}}
+        <div id="content">
+        {{- block "main" . }}{{- end }}
+        </div>
+        {{- partial "footer.html" . -}}
+    </body>
+</html>
+
+Consider change our layout, in themes/tutor-01/,
+layouts/index.html with block definition.
+
+{{ define "main" }}
+<p>Dear love,</p>
+
+{{ .Content }}
+
+<p>Sincerely yours.</p>
+{{ end }}
+
+We are not done yet, in themes/tutor-01/,
+we need to make partials/head.html
+
+<head>
+  <title>{{ .Site.Title }}</title>
+</head>
+
+And the result is:
+
+$ curl localhost:1313 | less
+
+<html>
+<head>
+  <meta name="generator" content="Hugo 0.42.1" />
+  <title>Letters to my Beloved</title>
+</head>
+<body><div id="content">
+<p>Dear love,</p>
+
+<p>There are so many things to say.
+  I don't want to live in regrets.
+  So I wrote this for my love.</p>
+
+
+<p>Sincerely yours.</p>
+
+        </div><script data-no-instant>document.write('<script src="/livereload.js?port=1313&mindelay=10"></' + 'script>')</script></body>
+</html>
+
+-- -- -- Theme 01 - 02 -- -- -- Refactor -- -- --
+
+We can refactor a common layout into these three artefacts.:
+
+* layouts/index.html
+* layouts/partials/header
+* layouts/partials/footer
+
+--
+
+$ cat layouts/index.html
+
+{{ define "main" }}
+{{ .Content }}
+{{ end }}
+
+
+--
+
+$ cat layouts/partials/header
+
+<p><i>My one, and only dream,</i></p>
+
+--
+
+$ cat layouts/partials/footer
+
+<p><i>Wishful thinking.</i></p>
+
+--
+
+The result is similar:
+
+$ curl localhost:1313 | less
+<html>
+<head>
+   <meta name="generator" content="Hugo 0.42.1" />
+  <title>Letters to my Beloved</title>
+</head>
+<body><p><i>My one, and only dream,</i></p>
+<div id="content">
+<p>There are so many things to say.
+  I don't want to live in regrets.
+  So I wrote this for my love.</p>
+
+
+        </div><p><i>Wishful thinking.</i></p>
+<script data-no-instant>document.write('<script src="/livereload.js?port=1313&mindelay=10"></' + 'script>')</script></body>
+</html>
+
+Now you can reuse parts as below.
+
+-- -- -- Theme 01 - 03 -- -- -- Reuse -- -- --
+
+Now we can reuse single page.
+We need these four artefacts:
+
+* themes/tutor-01/layouts/partials/head
+* themes/tutor-01/layouts/_default/single
+* content/duty.md
+* content/letters/hello.html
+--
+
+$ cat themes/tutor-01/layouts/partials/head
+
+<head>
+  <title>{{ .Page.Title | default .Site.Title }}</title>
+</head>
+
+You should see different title header at the top of browser later on.
+
+--
+
+$ cat themes/tutor-01/layouts/_default/single
+
+{{ define "main" }}
+<blockquote>I pour the <b>journal</b> as daily letter.</blockquote>
+
+{{ .Content }}
+{{ end }}
+
+--
+
+You can put the post in any directory.
+
+$ cat content/letters/hello.html
+
++++
+title = "Hello There"
++++
+  <p>I wish you are okay over there.
+     I just need to say hello.</p>
+
+and open it later in
+
+* http://localhost:1313/letters/hello/
+
+--
+
+You can use markdown format as well
+
+$ cat content/duty.md
+
++++
+title = "My Apology"
++++
+We still have duty calls to be done.
+I can't go home anytime soon.
+
+
+-- -- -- Theme 01 - 04 -- -- -- Section -- -- --
+
+I also put other content in letters directory.
+
+$ cat content/letters/winter.md
+
++++
+title = "Surviving White Winter"
++++
+
+It was a frozen winter in cold war era.
+We are two men, a boy, two women, a husky, and two shotguns.
+After three weeks, we finally configure dzen2.
+
+But we lost our beloved husky before we finally made it.
+Now, every january, we remember our husky,
+that helped all of us to survive.
+
+$ tree content
+
+content
+├── _index.html
+├── duty.md
+└── letters
+   ├── hello.html
+   └── winter.md
+
+By using /layouts/_default/list.html,
+you can access http://localhost:1313/letters/.
+
+$ cat /layouts/_default/list.html
+
+{{ define "main" }}
+  <h1>{{ .Section }}</h1>
+
+  {{ .Content }}
+
+  <ul>
+    {{ range .Data.Pages }}
+    <li>
+      <a href="{{ .URL }}">{{ .Title }}</a>
+    </li>
+    {{ end }}
+  </ul>
+{{ end }}
+
+Note that this list only show the list of letters folder.
+
+-- -- -- Theme 01 - 05 -- -- -- Taxonomy -- -- --
+
+Hugo has amazing taxonomy that almost tears my eye.
+Earlier we have list of section.
+Now we can setup categories and tags easily.
+We need to configure the config.toml
+
+baseURL      = "http://example.org/"
+languageCode = "en-us"
+title        = "Letters to my Beloved"
+theme        = "tutor-01"
+
+[taxonomies]
+  category = "categories"
+  tag = "tags"
+
+As we change the config.toml,
+we must also restart the server.
+
+--
+
+And add taxonomies into
+
+* content/letters/hello.html
+* content/letters/winter.md
+
+--
+
+$ cat content/letters/hello.html
+
++++
+title  = "Hello There"
+tags   = ["wishful", "story"]
+categories = ["love"]
++++
+  <p>I wish you are okay over there.
+     I just need to say hello.</p>
+
+--
+
+$ cat content/letters/winter.md
+
++++
+title  = "Surviving White Winter"
+tags   = ["duty", "story"]
+categories = ["love"]
++++
+
+It was a frozen winter in cold war era.
+We are two men, a boy, two women, a husky, and two shotguns.
+After three weeks, we finally configure dzen2.
+
+But we lost our beloved husky before we finally made it.
+Now, every january, we remember our husky,
+that helped all of us to survive.
+
+--
+
+Now we can access:
+
+* http://localhost:1313/categories/love/
+
+-- -- -- Theme 01 - 06 -- -- -- Custom Pages -- -- --
+
+We can make custom pages other than the default one.
+For example, we make a custom post, with slug and date.
+For this to achieve, we need to make this one artefact.
+
+* layouts/posts/single.html
+
+$ cat layouts/posts/single.html
+
+{{ define "main" }}
+<b>{{ .Date.Format "2006, 02 January" }}</b>
+
+<p>Dear Angel,</p>
+
+{{ .Content }}
+
+<p>With deep love in my heart.</p>
+{{ end }}
+
+--
+
+Consider make this one post as an example
+
+* content/posts/everyday.md
+
+$ cat content/posts/everyday.md
+
++++
+type   = "post"
+title  = "Everyday I Ask"
+date   = 2015-10-03T08:08:15+07:00
+slug   = "daily-wish"
+tags   = ["wishful", "story"]
+categories = ["love"]
++++
+
+You know, some people makes mistakes,
+and have to bear the consequences, for the rest of their life.
+I made, one good decision when I was far younger than you are.
+Later I know it was the right decision.
+But I also have to bear the consquences, for the rest of my life.
+
+> I wish you a good family, and happiness.
+
+--
+
+And also make new permalink format in config.toml.
+Restart Hugo server, as the config changing.
+
+Consider this URL to get the new permalink.
+
+* http://localhost:1313/posts/
+
+And you will get:
+
+* http://localhost:1313/posts/2015/10/03/daily-wish/
+

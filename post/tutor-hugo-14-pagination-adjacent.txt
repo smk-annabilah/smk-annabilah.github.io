@@ -1,0 +1,146 @@
+
+-- -- -- Theme 05 - 02 -- -- -- Source -- -- --
+
+I respect copyright.
+The code below inspired by:
+
+* https://glennmccomb.com/articles/how-to-build-custom-hugo-pagination/
+
+I made a slight modification.
+But Of course the logic remain the same.
+
+-- -- -- Theme 05 - 02 -- -- -- Prepare -- -- --
+
+Since we only have a few article, for tutorial purpose,
+I change paginator to paginate for each one article.
+And for a while, I only put 10 article.
+This way, we can have 10 pagination.
+
+I also use scratch.
+
+  {{ $paginator := .Paginate (where .Site.Pages "Type" "post") 1 }}
+  {{ partial "pagination-adjacent.html" (dict "p" $paginator "s" .Scratch) }}
+  <section id="archive">
+  <div class="post-list">
+    {{ range $paginator.Pages }}
+      {{ partial "summary-blog-list.html" . }}
+    {{ end }}
+  </div>
+
+-- -- -- Theme 05 - 02 -- -- -- Basic Math -- -- --
+
+# BASIC MATH
+
+CONST
+
+$totalPost   = 10
+$adjacent    = 2
+
+EQUATION
+
+$max_links   = ($adjacent * 2) + 1 = 5
+$lower_limit =  1 + $adjacent      = 3
+$upper_limit = 10 - $adjacent      = 8 
+
+-- -- --
+
+# ALGEBRA
+
++--------------+-------+-------+-------+-------+-------+
+| $pagination  |   1   |   2   |   5   |   7   |  10   |
++--------------+-------+-------+-------+-------+-------+
+| VARIABLE                                             |
+| $totalPages  |  10   |   5   |   2   |   2   |  N/A  |
+| $max_links   |   5   |   5   |   5   |   5   |  N/A  |
+| $lower_limit |   3   |   3   |   3   |   3   |  N/A  |
+| $upper_limit |   8   |   3   |   0   |   0   |  N/A  |
++--------------+-------+-------+-------+-------+-------+
+| MIDDLE PAGINATION                                    |
+| $pgNum =  1  | 1..5  | 1..5  | 1..2  | 1..2  |-------+
+| $pgNum =  2  | 1..5  | 1..5  | 1..2  | 1..2  |       |
+| $pgNum =  3  | 1..5  | 1..5  |-------+-------+       |
+| $pgNum =  4  | 2..6  | 1..5  |                       |
+| $pgNum =  5  | 3..7  | 1..5  |                       |
+| $pgNum =  6  | 4..8  |-------+                       |
+| $pgNum =  7  | 5..9  |                               |
+| $pgNum =  8  | 6..10 |                               |
+| $pgNum =  9  | 6..10 |                               |
+| $pgNum = 10  | 6..10 |                               |
++--------------+-------+-------------------------------+
+
+-- -- --
+
+CASE: Pager Numbers
+
+Complex Algorithm
+
++--------------+-------+
+| $pagination  |   1   |
+| $adjacent    |   2   |
+| $totalPost   |  10   |
++--------------+-------+
+| VARIABLE             |
+| $totalPages  |  10   |
+| $max_links   |   5   |
+| $lower_limit |   3   |
+| $upper_limit |   8   |
++--------------+-------+-+-------+-------+-------+-------+
+| .PageNumber  | adjacent| lower | l max | upper | u max |
++--------------+---------+-------+-------+-------+-------+
+| $pgNum =  1  |  1..3   |   T   | 1..5  |       | 6..10 |
+| $pgNum =  2  |  1..4   |   T   | 1..5  |       | 6..10 |
+| $pgNum =  3  |  1..5   |   T   | 1..5  |       | 6..10 |
+| $pgNum =  4  |  2..6   |       | 1..5  |       | 6..10 |
+| $pgNum =  5  |  3..7   |       | 1..5  |       | 6..10 |
+| $pgNum =  6  |  4..8   |       | 1..5  |       | 6..10 |
+| $pgNum =  7  |  5..9   |       | 1..5  |       | 6..10 |
+| $pgNum =  8  |  6..10  |       | 1..5  |   T   | 6..10 |
+| $pgNum =  9  |  7..10  |       | 1..5  |   T   | 6..10 |
+| $pgNum = 10  |  8..10  |       | 1..5  |   T   | 6..10 |
++--------------+---------+-------+-------+-------+-------+
+
++--------------+-------+
+| VARIABLE             |
+| $totalPages  |  10   |
+| $max_links   |   5   |
+| $lower_limit |   3   |
+| $upper_limit |   8   |
++--------------+-------+-------+---------+
+| .PageNumber  | lower | upper | adjacent|
++--------------+-------+-------+---------+
+| $pgNum =  1  | 1..5  |       |         |
+| $pgNum =  2  | 1..5  |       |         |
+| $pgNum =  3  | 1..5  |       |         |
+| $pgNum =  4  |       |       |  2..6   |
+| $pgNum =  5  |       |       |  3..7   |
+| $pgNum =  6  |       |       |  4..8   |
+| $pgNum =  7  |       |       |  5..9   |
+| $pgNum =  8  |       | 6..10 |         |
+| $pgNum =  9  |       | 6..10 |         |
+| $pgNum = 10  |       | 6..10 |         |
++--------------+-------+-------+---------+
+| .PageNumber  | if elsif else | result  |
++--------------+---------------+---------+
+| $pgNum =  1  |               |  1..5   |
+| $pgNum =  2  |               |  1..5   |
+| $pgNum =  3  |               |  1..5   |
+| $pgNum =  4  |               |  2..6   |
+| $pgNum =  5  |               |  3..7   |
+| $pgNum =  6  |               |  4..8   |
+| $pgNum =  7  |               |  5..9   |
+| $pgNum =  8  |               |  6..10  |
+| $pgNum =  9  |               |  6..10  |
+| $pgNum = 10  |               |  6..10  |
++--------------+---------------+---------+
+
+-- -- -- Theme 05 - 02 -- -- -- Adjacent -- -- --
+
+-- -- -- Theme 05 - 02 -- -- -- Prev Next -- -- --
+
+-- -- -- Theme 05 - 02 -- -- -- Before After -- -- --
+
+-- -- -- Theme 05 - 02 -- -- -- Responsive -- -- --
+
+-- -- -- Theme 05 - 02 -- -- -- Responsive -- -- --
+
+

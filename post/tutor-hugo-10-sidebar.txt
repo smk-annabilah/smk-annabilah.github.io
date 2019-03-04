@@ -1,0 +1,226 @@
+
+-- -- -- Theme 05 - 01 -- -- -- Prepare -- -- --
+
+We can make a sidebar, so that we can have more information,
+just like what common in wordpress site or other blogging platform.
+
+(with your file manager)
+
+Copy manually /themes/tutor-04 to /themes/tutor-05
+
+$ cat config.toml
+theme        = "tutor-05"
+
+-- -- --
+
+* themes/tutor-05/layouts/post/single.html
+
+{{ define "aside" }}
+  <aside class="col-md-4">
+    {{ partial "card-recent-posts.html" . }}
+    {{ partial "card-archives.html" . }}
+
+    {{ partial "card-categories.html" . }}
+    {{ partial "card-tags.html" . }}
+
+    {{ partial "card-friends.html" . }}    
+    {{ partial "card-related-posts.html" . }}
+  </aside>
+{{ end }}
+
+-- -- --
+
+I'm using Bootstrap card.
+So I do not need to setup my own css.
+
+However, I still need a few changes, to make it a little bit pretty.
+
+* themes/tutor-05/sass/css/_list.scss
+
+// -- -- -- -- --
+// _list.scss
+
+div.archive-list {
+  position: relative;
+}
+
+div.archive-list a:before {
+  position: absolute;
+  left: -15px;
+  content: "\00BB";
+  color: $dark;
+}
+
+div.archive-list:hover {
+  background-color: lighten($yellow, 10%);
+}
+
+ul.archive-list,
+ul.archive-list ul, {
+  position: relative;
+  list-style: none;
+}
+
+ul.archive-list li:before {
+  position: relative;
+  left: -15px;
+  content: "\00BB";
+  color: $dark;
+}
+
+ul.archive-list li:hover {
+  background-color: lighten($yellow, 10%);
+}
+
+ul.archive-list li li:hover {
+  background-color: lighten($yellow, 30%);
+}
+
+-- -- -- Theme 05 - 01 -- -- -- Recent Post -- -- --
+
+* themes/tutor-05/layouts/post/single.html
+
+{{ define "aside" }}
+  <aside class="col-md-4">
+    {{ partial "card-recent-posts.html" . }}
+  </aside>
+{{ end }}
+
+-- -- --
+
+* themes/tutor-05/layouts/partials/card-recent-posts.html
+
+<div class="card hidden-sm hidden-xs mb-3">
+  <div class="card-header bg-dark text-light pb-0">
+    <p class="card-title">Recent Posts</p>
+  </div>
+  <div class="card-body py-2">
+    <ul class="archive-list">
+      {{ range first 5 (where .Site.Pages "Type" "post") }}
+      <li><a href="{{ .URL | absURL }}">{{ .Title }}</a></li>
+      {{ end }}
+    </ul>
+  </div>
+</div>
+
+-- -- --
+
+Result
+
+Now you can see the result in the browser.
+Due to the wide image, I crop only the card part.
+
+[image]
+
+-- -- -- Theme 05 - 01 -- -- -- Categories and Tags -- -- --
+
+Both are Taxonomies.
+So the layouts is pretty similar.
+
+* themes/tutor-05/layouts/partials/card-categories.html
+
+<div class="card mb-3">
+  <div class="card-header bg-dark text-light pb-0">
+    <p class="card-title">Categories</p>
+  </div>
+  <div class="card-body py-2">
+    {{ range $name, $taxonomy := .Site.Taxonomies.categories }}
+      <a href="{{ printf "categories/%s" $name | absURL }}">
+        <span class="badge badge-primary">{{ $name }}</span>
+      </a>&nbsp;
+    {{ end }}
+  </div>
+</div> 
+
+Result
+
+Now you can see the result in the browser.
+Due to the wide image, I crop only the card part.
+
+[image]
+
+* themes/tutor-05/layouts/partials/card-tags.html
+
+<div class="card mb-3">
+  <div class="card-header bg-dark text-light pb-0">
+    <p class="card-title">Tags</p>
+  </div>
+  <div class="card-body py-2">
+    {{ range $name, $taxonomy := .Site.Taxonomies.tags }}
+      <a href="{{ printf "tags/%s" $name | absURL }}">
+        <span class="badge badge-secondary">{{ $name }}</span>
+      </a>&nbsp;
+    {{ end }}
+  </div>
+</div> 
+
+
+Result
+
+Now you can see the result in the browser.
+Due to the wide image, I crop only the card part.
+
+[image]
+
+-- -- -- Theme 05 - 01 -- -- -- Archives -- -- --
+
+Remember the Archives tutorial in a previous chapter ?
+We can also apply this.
+
+* themes/tutor-05/layouts/partials/card-archives.html
+
+<div class="card mb-3">
+  <div class="card-header bg-dark text-light pb-0">
+    <p class="card-title">Archives</p>
+  </div>
+  <div class="card-body py-2">
+
+  {{ $posts := where .Site.Pages "Type" "post" }}
+  {{ $page_year   := .Page.Date.Format "2006" }}
+  {{ $page_month  := .Page.Date.Format "January" }}
+    
+  {{ range ($posts.GroupByDate "2006") }}  
+    {{ $year := .Key }}
+      <div class ="archive-year" id="{{ $year }}">
+        <a href="{{ "pages/archives" | absURL }}#{{ $year }}">
+        {{ $year }}</a>
+      </div>
+
+    {{ if eq $year $page_year }}
+      <ul class="archive-list">
+      {{ range (.Pages.GroupByDate "January") }}
+      {{ $month := .Key }}
+      <li>
+        
+        <span id="{{ $year }}-{{ $month }}">
+              <a href="{{ "pages/archives" | absURL }}#{{ $year }}-{{ $month }}">
+              {{ $month }}</a> - {{ $year }}</span>
+
+        {{ if eq $month $page_month }}
+          <ul>
+          {{ range $post_month := .Pages }}
+
+          <li>
+            <a href="{{ $post_month.URL | absURL }}">
+              {{ $post_month.Title }}
+            </a>
+          </li>
+          {{ end }}
+          </ul>
+        {{ end }}
+
+      </li>
+      {{ end }}
+      </ul>
+    {{ end }}
+
+  {{ end }}
+  </div>
+</div> 
+
+Result
+
+Now you can see the result in the browser.
+Due to the wide image, I crop only the card part.
+
+[image]

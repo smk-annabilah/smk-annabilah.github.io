@@ -1,0 +1,192 @@
+
+-- -- -- Theme 05 - 02 -- -- -- Prepare -- -- --
+
+There is no such things as database connection in static site generator.
+
+However, we can use static data, to fulfill simple requirement.
+
+
+-- -- -- Theme 05 - 01 -- -- -- Friends -- -- --
+
+Data
+
+Suppossed, we want to show all blog site, at panel in the sidebar.
+Instead of manually coding the html, we can prepare the data.
+
+* data/friends.yml
+
+# Helper for related links
+
+- title: "BanditHijo (R)-Chive"
+  url: http://bandithijo.com/
+
+- title: "epsi @ github.io"
+  url: http://epsi-rns.github.io/
+
+This might looks stupid,
+because we can directly write the result in html.
+But in the next example, we can show you how data can be dynamic.
+
+Later we can acces this simple data using .Site.Data.friends
+
+-- -- --
+
+* themes/tutor-05/layouts/partials/friends.html
+
+<div class="card hidden-sm hidden-xs mb-3">
+  <div class="card-header bg-dark text-light pb-0">
+    <p class="card-title">Friends</p>
+  </div>
+  <div class="card-body py-2">
+    <ul class="archive-list">
+      {{ range first 9 .Site.Data.friends }}
+      <li><a href="{{ .url }}">{{ .title }}</a></li>
+      {{ end }}
+    </ul>
+  </div>
+</div>
+
+-- -- --
+
+Do not forget to change the single.html
+
+* themes/tutor-05/layouts/post/single.html
+
+{{ define "aside" }}
+  <aside class="col-md-4">
+    {{ partial "card-friends.html" . }}
+  </aside>
+{{ end }}
+
+-- -- --
+
+Result
+
+Now you can see the result in the browser.
+Due to the wide image, I crop only the card part.
+
+[image]
+
+-- -- -- Theme 05 - 01 -- -- -- Related Posts -- -- --
+
+Rememmber our last archives page ?
+Yeah, the yaml data one.
+We can use it here.
+
+The data look like here below:
+
+* data/archives.yml
+
+# Helper for related links
+# Archives by Date
+
+...
+
+- id: 14032535
+  title: "Bruce Springsteen - One Step Up"
+  url: /quotes/2014/03/25/bruce-springsteen-one-step-up/
+  
+- id: 14031535
+  title: "Bruce Springsteen - The River"
+  url: /quotes/2014/03/15/bruce-springsteen-the-river/
+
+...
+
+-- -- --
+
+So what is it, the id field ?
+Well, our data related posts , need a simple data id.
+But since we do not have RDBMS, we can emulate the id.
+We are going to use the id from the date field in frontmatter.
+
+The data/archives.yml itself is generated.
+We have already discuss in previous chapter.
+
+* themes/tutor-05/layouts/archives/single.yml.yml
+
+{{- define "main" -}}
+# Helper for related links
+# {{ .Title }}
+
+{{ range (where .Site.Pages "Type" "post") }}
+  {{- if .Date }}
+- id: {{ .Date.Format "06010204" }}
+  title: "{{ .Title }}"
+  url: {{ .URL }}
+  {{ end -}}
+{{ end }}
+
+{{- end -}}
+
+The format "06010204", means [year-month-date-minute].
+It is rarely, that I blog with the same minute in the same day.
+This way, the id would be unique.
+
+The data should be downloaded manually
+* from http://localhost:1313/pages/archives/index.yml
+* and copy to data/archives.yml
+
+I know, it seems tricky, but it works well so far.
+
+-- -- --
+
+Now that we already have the id, it is time to use the data.
+
+* themes/tutor-05/layouts/partials/card-related-posts.html
+
+{{ if .Params.related_link_ids }}
+<div class="card hidden-sm mb-3">
+  <div class="card-header bg-dark text-light pb-0">
+    <p class="card-title">Related Posts</p>
+  </div>
+  <div class="card-body py-2">
+    <ul class="archive-list">
+      {{ range $cur := .Params.related_link_ids }}
+      <li>   
+        {{ range $.Site.Data.archives }}
+
+          {{- if eq $cur (print .id) -}}
+          <a href="{{ .url | absURL }}">{{ .title }}</a>
+          {{- end -}}
+
+        {{ end }}
+      </li>
+      {{ end }}
+    </ul>
+  </div>
+</div>
+{{ end }}
+
+-- -- --
+
+If we want to use it, related_link_ids in frontmatter.
+Consider this example.
+
++++
+type       = "post"
+title      = "Bruce Springsteen - The River"
+date       = 2014-03-15T07:35:05+07:00
+categories = ["lyric"]
+tags       = ["springsteen", "80s"]
+slug       = "bruce-springsteen-the-river"
+author     = "epsi"
+
+related_link_ids = [
+  "14032535"  # One Step Up
+]
+
++++
+
+Is a dream a lie 
+if it don't come true? 
+Or is it something worse?
+s
+-- -- --
+
+
+Result
+
+Now you can see the result in the browser.
+Due to the wide image, I crop only the card part.
+
+[image]

@@ -1,0 +1,252 @@
+
+Building Content
+
+-- -- -- Theme 04 - 01 -- -- -- Archetypes -- -- --
+
+I have been looking for a good content for these tutorial.
+And believe me it is as hard as giving a good variable naming.
+I look for simple content, such as churchill quotes,
+also navier-stokes explanation,
+and finally end up with quotes song lyric.
+
+themes/tutor-04/archetypes/quotes.md
+
++++
+type       = "post"
+title      = "{{ replace .TranslationBaseName "-" " " | title }}"
+date       = {{ .Date }}
+categories = []
+tags       = []
+slug       = ""
+author     = "epsi"
+draft      = true
++++
+
+config.toml
+
+[permalinks]
+  posts    = ":section/:year/:month/:day/:slug"
+  quotes   = ":section/:year/:month/:day/:slug"
+
+-- -- -- Theme 04 - 02 -- -- -- Populate the Content -- -- --
+
+Now you can easily make ten content with archetypes.
+
+$ hugo new quotes/bruce-springsteen-the-river
+/media/Works/sites/tutor-hugo/content/quotes/bruce-springsteen-the-river created
+
+and the result will be
+
+$ cat content/quotes/bruce-springsteen-the-river.md
+
++++
+type       = "post"
+title      = "Bruce Springsteen the River"
+date       = 2018-09-15T07:35:05+07:00
+categories = ["lyric"]
+tags       = []
+slug       = ""
+author     = "epsi"
+draft      = true
++++
+
+Edit the frontmatter and add content,
+so that we have something similar as below:
+
++++
+type       = "post"
+title      = "Bruce Springsteen - The River"
+date       = 2014-03-15T07:35:05+07:00
+categories = ["lyric"]
+tags       = [springsteen, 80s]
+slug       = "bruce-springsteen-the-river"
+author     = "epsi"
++++
+
+Is a dream a lie 
+if it don't come true? 
+Or is it something worse?
+
+-- -- --
+
+Consider do the rest for these nine lyrics:
+
+$ for i in quotes/{\
+"bruce-springsteen-one-step-up",\
+"joni-mitchell-both-sides-now",\
+"john-mayer-slow-dancing-in-a-burning-room",\
+"julian-baker-something",\
+"sarah-mclachlan-angel",\
+"avenged-sevenfold-so-far-away",\
+"michael-jackson-gone-too-soon",\
+"mothers-no-crying-in-baseball",\
+"blink-182-adams-song"}.md;\
+do hugo new "$i"; done
+
+/media/Works/sites/tutor-hugo/content/quotes/bruce-springsteen-one-step-up.md created
+/media/Works/sites/tutor-hugo/content/quotes/joni-mitchell-both-sides-now.md created
+/media/Works/sites/tutor-hugo/content/quotes/john-mayer-slow-dancing-in-a-burning-room.md created
+/media/Works/sites/tutor-hugo/content/quotes/julian-baker-something.md created
+/media/Works/sites/tutor-hugo/content/quotes/sarah-mclachlan-angel.md created
+/media/Works/sites/tutor-hugo/content/quotes/avenged-sevenfold-so-far-away.md created
+/media/Works/sites/tutor-hugo/content/quotes/michael-jackson-gone-too-soon.md created
+/media/Works/sites/tutor-hugo/content/quotes/mothers-no-crying-in-baseball.md created
+/media/Works/sites/tutor-hugo/content/quotes/blink-182-adams-song.md created
+
+--
+
+Also edit the frontmatter and add content,
+for the rest of the nine lyrics.
+
+-- -- --
+
+Now we can see the list:
+
+* http://localhost:1313/quotes/
+
+[image]
+
+Now we need to design a more informative
+template layout for this content list.
+
+-- -- -- Theme 04 - 03 -- -- -- Listing the Content -- -- --
+
+Consider change this artefact:
+
+* layouts/_default/list.html
+
+Instead of all kind of pages,
+we filter it t show only post type.
+
+{{ define "main" }}
+<main role="main" 
+      class="container-fluid m-3 m-sm-0 p-3
+             bg-light rounded border border-dark shadow-hover">
+  <header>
+    <h4>{{ .Section }}</h4>
+  </header>
+
+  {{ .Content }}
+
+  {{ $posts := where .Data.Pages "Type" "post" }}
+  <section id="archive">
+    {{ range ($posts.GroupByDate "2006") }}
+      {{ partial "summary-by-year.html" . }}
+    {{ end }}
+  </section>
+</main>
+{{ end }}
+
+-- 
+
+Instead of simple loop, we group the article by year.
+The detail of partial can bee seen here.
+
+* layouts/partials/summary-by-year.html
+
+      <div class ="anchor-target archive-year" 
+           id="{{ .Key }}">{{ .Key }}</div>
+
+      {{ range .Pages }}
+      <div class="d-flex flex-row-reverse archive-list">
+        <div class="text-right "><time>
+            {{ .Date.Format "02 Jan" }}&nbsp;</time></div>
+        <div class="mr-auto"><a href="{{ .URL | absURL }}">
+          {{ .Title }}
+        </a></div>
+      </div>
+      {{ end }}
+
+--
+
+Add custom css
+
+* sass/css/_decoration.scss
+
+// -- -- -- -- --
+// _list.scss
+
+.archive-list {
+  position: relative;
+}
+
+.archive-list a:before {
+  position: absolute;
+  left: -15px;
+  content: "\00BB";
+  color: $dark;
+}
+
+.archive-list:hover {
+  background-color: $yellow;
+}
+
+--
+
+* sass/css/main.scss
+
+@import
+  ...
+
+  // custom
+    "layout",
+    "decoration",
+    "list"
+;
+
+--
+
+[image-by-year]
+
+-- -- -- Theme 04 - 03 -- -- -- Complex Listing -- -- --
+
+Of course, you can make, a more sophisticated listing,
+by changing this artefact:
+
+* layouts/_default/list.html
+
+{{ define "main" }}
+<main role="main" 
+  ...
+
+  <section id="archive">
+    {{ range ($posts.GroupByDate "2006") }}
+      {{ partial "summary-by-month.html" . }}
+    {{ end }}
+  </section>
+</main>
+{{ end }}
+
+--
+
+We use multiple loop stage. 
+Group the article by year.
+And Group Article by month.
+
+* layouts/partials/summary-by-month.html
+
+  {{ $year := .Key }}
+  <div class ="anchor-target archive-year" 
+       id="{{ .Key }}">{{ $year }}</div>
+
+  {{ range (.Pages.GroupByDate "January") }}
+  {{ $month := .Key }}
+  <div class="px-3">
+    <span class ="anchor-target archive-month" 
+          id="{{ $year }}-{{ $month }}">
+          {{ $month }} - {{ $year }}</span>
+
+    <div class="px-3">
+      {{ range .Pages }}
+      <div class="d-flex flex-row-reverse archive-list">
+        <div class="text-right text-nowrap"><time>
+            {{ .Date.Format "02 Jan" }}&nbsp;</time></div>
+        <div class="mr-auto"><a href="{{ .URL | absURL }}">
+          {{ .Title }}
+        </a></div>
+       </div>
+      {{ end }}
+     </div>
+
+  </div>
+  {{ end }}

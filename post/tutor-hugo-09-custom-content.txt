@@ -1,0 +1,235 @@
+
+Custom Content Type
+
+-- -- -- Theme 04 - 07 -- -- -- Prepare -- -- --
+
+We can make a custom content for archiving.
+
+Remember our last archive page ?
+
+* content/pages/archives.md
+
++++
+type  = "archives"
+title = "Archives by Date"
++++
+
+-- -- --
+
+Instead of just html page, we will enhanced this archive,
+to output different custom content type.
+
++++
+type  = "archives"
+title = "Archives by Date"
+outputs = ["html", "txt", "yml", "json"]
++++
+
+Why do we even need these custom outputs ?
+
+* The HTML, we already seen in previous chapter
+
+* The JSON artefact as a search data source for lunr json.
+
+* The YAML artefact to build data source for related pages,
+  something that you usually seen in wordpress posts.
+
+* The plain text artefact, is just another demo.
+  Because not every browser can handle yaml type,
+  I use the plain fo easiness reason
+
+-- -- --
+
+In order to do this,
+we need to make a little adjustment in our beloved config file.
+Making some new definition in config.toml.
+
+* config.toml
+
+# An example of Hugo site for tutorial purpose.
+
+...
+
+[mediaTypes]
+  [mediaTypes."text/yaml"]
+    suffix = "yml"
+
+[outputFormats]
+  [outputFormats.yml]
+    baseName    = "index"
+    mediaType   = "text/yaml"
+    isPlainText = true
+  [outputFormats.txt]
+    baseName    = "index"
+    mediaType   = "text/plain"
+    isPlainText = true
+
+* JSON is already a standard output type.
+  So we don't need to change anything.
+
+* On the other hand, we need to define YAML mediaTypes.
+
+* However, we still need to define txt output formats.
+
+-- -- -- Theme 04 - 07 -- -- -- JSON -- -- --
+
+Reading
+
+* https://forestry.io/blog/build-a-json-api-with-hugo/
+
+-- -- --
+
+Preparation
+
+We need these two artefacts.
+
+$ touch themes/tutor-04/layouts/archives/baseof.json.json
+$ touch themes/tutor-04/layouts/archives/single.json.json
+
+We have already this archives.md, no need to recreate.
+
+$ cat content/pages/archives.md
+
+-- -- --
+
+Our base is as simply as this below.
+
+* themes/tutor-04/layouts/archives/baseof.json.json
+
+{{ block "main" .}}{{ end }}
+
+-- -- --
+
+The detail is in 
+
+* themes/tutor-04/layouts/archives/single.json.json
+
+{{ define "main" }}
+{{- $posts := where .Site.Pages "Type" "post" -}}
+{{- $postCount := len $posts -}}
+{
+  {{ range $i, $e := $posts }}
+    "{{ .URL | urlize }}": {
+      "title": {{ jsonify $e.Title }},
+      "content": {{ jsonify ($e.Params.excerpt | default $e.Summary) }},
+      "url": {{ jsonify .Permalink }},
+      "author": {{ jsonify $e.Params.author }},
+      "category": {{ jsonify $e.Section  }}
+    }
+    {{- if not (eq (add $i 1) $postCount) }},{{ end -}}
+  {{ end }}
+}
+{{ end }}
+
+-- -- --
+
+* http://localhost:1313/pages/archives/index.json
+
+This will produce something like
+
+{
+  
+    "/quotes/2018/09/13/mothers-no-crying-in-baseball/": {
+      "title": "Mothers - No Crying in Baseball",
+      "content": "There\u0026rsquo;s no crying in baseball. Try to understand.",
+      "url": "http://localhost:1313/quotes/2018/09/13/mothers-no-crying-in-baseball/",
+      "author": "epsi",
+      "category": "quotes"
+    },
+    "/quotes/2018/09/07/julian-baker-something/": {
+      ...
+    },
+    ...
+}
+
+[image]
+
+-- -- -- Theme 04 - 07 -- -- -- YAML and Text-- -- --
+
+Preparation
+
+We need these two artefacts.
+
+$ touch themes/tutor-04/layouts/archives/baseof.yml.yml
+$ touch themes/tutor-04/layouts/archives/single.yml.yml
+$ touch themes/tutor-04/layouts/archives/baseof.txt.txt
+$ touch themes/tutor-04/layouts/archives/single.txt.txt
+
+We have already the archives.md.
+
+-- -- --
+
+Our base for both yml and txt, are as simply as this below.
+
+* themes/tutor-04/layouts/archives/baseof.yml.yml
+* themes/tutor-04/layouts/archives/baseof.txt.txt
+
+{{ block "main" .}}{{ end }}
+
+-- -- --
+
+The detail is in 
+
+* themes/tutor-04/layouts/archives/baseof.txt.txt
+* themes/tutor-04/layouts/archives/single.txt.txt
+
+{{- define "main" -}}
+# Helper for related links
+# {{ .Title }}
+
+{{ range (where .Site.Pages "Type" "post") }}
+  {{- if .Date }}
+- id: {{ .Date.Format "06010204" }}
+  title: "{{ .Title }}"
+  url: {{ .URL }}
+  {{ end -}}
+{{ end }}
+
+{{- end -}}
+
+-- -- --
+
+* http://localhost:1313/pages/archives/index.txt
+
+This will produce something like:
+
+# Helper for related links
+# Archives by Date
+
+- id: 18091335
+  title: "Mothers - No Crying in Baseball"
+  url: /quotes/2018/09/13/mothers-no-crying-in-baseball/
+  
+- id: 18090735
+  title: "Julian Baker - Something"
+  url: /quotes/2018/09/07/julian-baker-something/
+
+[image]
+
+So we can easily copy paste the output to any text editor.
+
+-- -- --
+
+* http://localhost:1313/pages/archives/index.yml
+
+Since no handle for text/yaml in browser,
+the browser will ask if it should be downloaded
+
+
+So we can easily copy paste the output to any text editor.
+
+-- -- -- Theme 04 - 07 -- -- -- summary-- -- --
+
+Since we have four type, we have four single layouts.
+
+$ tree themes/tutor-04/layouts/archives/
+themes/tutor-04/layouts/archives/
+├── baseof.json.json
+├── baseof.txt.txt
+├── baseof.yml.yml
+├── list.html
+├── single.html
+├── single.json.json
+├── single.txt.txt
+└── single.yml.yml
+

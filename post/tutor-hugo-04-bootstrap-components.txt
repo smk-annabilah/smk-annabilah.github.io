@@ -1,0 +1,182 @@
+
+-- -- -- Theme 02 - 04 -- -- -- Navigation -- -- --
+
+http://getbootstrap.com/docs/4.1/examples/sticky-footer-navbar/
+
+$ cat layouts/partials/site-head.html
+
+    <link rel="stylesheet" type="text/css" href="{{ "css/sticky-footer-navbar.css" | relURL }}">
+    <link rel="stylesheet" type="text/css" href="{{ "css/bootstrap-custom.css" | relURL }}">
+
+--
+
+$ cat layouts/partials/site-scripts.html
+
+    <script src="{{ "js/jquery-slim.min.js" | relURL }}"></script>
+    <script src="{{ "dist/js/bootstrap.min.js" | relURL }}"></script>
+-- 
+
+* 96px * 96px
+
+* static/images/logo-gear.png
+
+--
+
+$ cat layouts/partials/site-header.html
+
+<header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="{{ .Site.BaseURL }}">
+       <img src="{{ "images/logo-gear.png" | absURL }}"
+           alt="Logo" />
+    </a>
+    <button class="navbar-toggler" type="button" 
+        data-toggle="collapse" data-target="#navbarCollapse" 
+        aria-controls="navbarCollapse" aria-expanded="false" 
+        aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="{{ .Site.BaseURL }}"
+             >Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Archives</a>
+        </li>
+      </ul>
+      <form class="form-inline mt-2 mt-md-0">
+        <input class="form-control mr-sm-2" type="text" 
+          placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-light my-2 my-sm-0" 
+          type="submit">Search</button>
+      </form>
+    </div>
+  </nav>
+</header>
+
+
+--
+
+$ cat layouts/partials/site-footer.html
+
+<footer class="bg-dark text-light">
+  <div class="container text-center">
+    <span class="text-muted">&copy; {{ now.Year }}.</span>
+  </div>
+</footer>
+
+--
+
+$ cat static/css/bootstrap-custom.css
+
+.layout-base {
+  padding-top: 70px;
+}
+
+.navbar-brand img {
+  width: 48px;
+  height: 48px;
+  margin-top:    -10px;
+  margin-bottom: -10px;
+}
+
+
+-- -- -- Theme 02 - 05 -- -- -- Components -- -- --
+
+$ cat layouts/post/single.html
+
+{{ define "main" }}
+  <main role="main" class="container-fluid bg-light">
+    <div class="blog-main">
+      <div class="blog-post">
+        <section>
+          <h2 class="blog-post-title"
+              >{{ .Title | default .Site.Title }}</h2>
+          <p  class="blog-post-meta"
+              >{{ .Page.Date.Format "January 02, 2006" }} by <a href="#">epsi</a></p>
+        </section>
+
+        <article>
+          {{ .Content }}
+        </article>
+      </div><!-- /.blog-post -->
+    </div><!-- /.blog-main -->
+  </main>
+{{ end }}
+
+--
+
+Why not go further with bootstrap grid ?
+
+$ cat layouts/partials/site-head.html
+
+    <link rel="stylesheet" type="text/css" href="{{ "css/sticky-footer-navbar.css" | relURL }}">
+    <link rel="stylesheet" type="text/css" href="{{ "css/blog.css" | relURL }}">
+    <link rel="stylesheet" type="text/css" href="{{ "css/bootstrap-custom.css" | relURL }}">
+
+$ cat layouts/post/single.html
+
+{{ define "main" }}
+  <main role="main" class="col-md-8">
+    <div class="blog-main p-3 mb-3 bg-light rounded">
+      <div class="blog-post">
+        <section>
+          <h2 class="blog-post-title"
+              >{{ .Title | default .Site.Title }}</h2>
+          <p  class="blog-post-meta"
+              >{{ .Page.Date.Format "January 02, 2006" }} by <a href="#">epsi</a></p>
+        </section>
+
+        <article>
+          {{ .Content }}
+        </article>
+      </div><!-- /.blog-post -->
+    </div><!-- /.blog-main -->
+  </main>
+{{ end }}
+
+{{ define "aside" }}
+  <aside class="col-md-4 blog-sidebar">
+    <div class="p-3 mb-3 bg-light rounded">
+      <h4 class="font-italic">About You</h4>
+      Are you an angel ?
+    </div>
+  </aside>
+{{ end }}
+
+--
+
+$ cat layouts/index.html
+
+{{ define "main" }}
+  <main role="main" class="container-fluid">
+      <div class="jumbotron">
+        <div class="container bg-light text-dark">
+    <section>
+      <h2 class="cover-heading">{{ .Title | default .Site.Title }}</h2>
+    </section>
+
+    <article>
+      {{ .Content }}
+    </article>
+        </div>
+      </div>
+  </main>
+{{ end }}
+
+$ cat content/_index.html
+
+  <p class="lead">There are so many things to say.
+  I don't want to live in regrets.
+  So I wrote this for my love.</p>
+
+$ cat static/css/bootstrap-custom.css
+
+.cover-heading,
+.blog-post-title {
+  text-shadow: 0 .05rem .1rem rgba(0, 0, 0, .5);
+}
+
+--
